@@ -9,8 +9,10 @@ interface CartState {
   items: CartItem[];
 }
 
+const savedCart = sessionStorage.getItem("cart");
+
 const initialState: CartState = {
-  items: [],
+  items: savedCart ? JSON.parse(savedCart) : [],
 };
 
 const cartSlice = createSlice({

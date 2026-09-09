@@ -1,16 +1,19 @@
 import { useState } from "react";
+import { useDispatch } from "react-redux";
 import { useQuery } from "@tanstack/react-query";
+
 import {
   fetchProducts,
   fetchCategories,
   fetchProductsByCategory,
 } from "../api/products";
-import { useDispatch } from "react-redux";
+
 import { addToCart } from "../redux/cartSlice";
 
 const ProductList = () => {
-  const [selectedCategory, setSelectedCategory] = useState("");
   const dispatch = useDispatch();
+
+  const [selectedCategory, setSelectedCategory] = useState("");
 
   const {
     data: products,
@@ -34,64 +37,88 @@ const ProductList = () => {
   });
 
   if (isLoading) {
-    return <p>Loading products...</p>;
+    return <p className="status-message">Loading products...</p>;
   }
 
   if (error) {
-    return <p>Unable to load products.</p>;
+    return <p className="status-message">Unable to load products.</p>;
   }
 
   if (categoriesLoading) {
-    return <p>Loading categories...</p>;
+    return <p className="status-message">Loading categories...</p>;
   }
 
   if (categoriesError) {
-    return <p>Unable to load categories.</p>;
+    return <p className="status-message">Unable to load categories.</p>;
   }
 
   return (
-    <div>
-      <h1>Product Catalog</h1>
-
-      <label htmlFor="category">Choose a category: </label>
-
-      <select
-        id="category"
-        value={selectedCategory}
-        onChange={(event) => setSelectedCategory(event.target.value)}
-      >
-        <option value="">All Products</option>
-
-        {categories?.map((category) => (
-          <option key={category} value={category}>
-            {category}
-          </option>
-        ))}
-      </select>
-
-      {products?.map((product) => (
-        <div key={product.id}>
-          <h2>{product.title}</h2>
-
-          <img
-            src={product.image}
-            alt={product.title}
-            width="150"
-            onError={(event) => {
-              event.currentTarget.src = "https://via.placeholder.com/150";
-            }}
-          />
-
-          <p>Price: ${product.price}</p>
-          <p>Category: {product.category}</p>
-          <p>{product.description}</p>
-          <p>Rating: {product.rating.rate}</p>
-          <button onClick={() => dispatch(addToCart(product))}>
-            Add to Cart
-          </button>
+    <section className="catalog-section">
+      <div className="catalog-header">
+        <div>
+          <h1>Product Catalog</h1>
+          <p>Discover quality products for every lifestyle.</p>
         </div>
-      ))}
-    </div>
+
+        <div className="category-filter">
+          <label htmlFor="category">Category</label>
+
+          <select
+            id="category"
+            value={selectedCategory}
+            onChange={(event) => setSelectedCategory(event.target.value)}
+          >
+            <option value="">All Products</option>
+
+            {categories?.map((category) => (
+              <option key={category} value={category}>
+                {category}
+              </option>
+            ))}
+          </select>
+        </div>
+      </div>
+
+      <div className="product-grid">
+        {products?.map((product) => (
+          <article className="product-card" key={product.id}>
+            <div className="product-image-wrapper">
+              <img
+                className="product-image"
+                src={product.image}
+                alt={product.title}
+                onError={(event) => {
+                  event.currentTarget.src = "https://via.placeholder.com/300";
+                }}
+              />
+            </div>
+
+            <div className="product-info">
+              <p className="product-category">{product.category}</p>
+
+              <h2>{product.title}</h2>
+
+              <p className="product-description">{product.description}</p>
+
+              <div className="product-rating">
+                <span>★</span>
+                <span>{product.rating.rate}</span>
+                <span>({product.rating.count})</span>
+              </div>
+
+              <p className="product-price">${product.price.toFixed(2)}</p>
+
+              <button
+                className="add-to-cart-button"
+                onClick={() => dispatch(addToCart(product))}
+              >
+                Add to Cart
+              </button>
+            </div>
+          </article>
+        ))}
+      </div>
+    </section>
   );
 };
 

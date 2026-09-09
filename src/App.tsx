@@ -3,10 +3,15 @@ import Cart from "./components/Cart";
 
 function App() {
   return (
-    <div>
-      <ProductList />
-      <Cart />
-    </div>
+    <main className="store-layout">
+      <div className="products-column">
+        <ProductList />
+      </div>
+
+      <aside className="cart-column">
+        <Cart />
+      </aside>
+    </main>
   );
 }
 
