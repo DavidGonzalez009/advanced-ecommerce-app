@@ -1,75 +1,75 @@
-# React + TypeScript + Vite
+# Advanced React E-Commerce App
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This is an e-commerce web app I built using React, TypeScript, React Query and Redux Toolkit. The goal of this project was to build a working online store where users can browse products, filter by category, add products to a shopping cart, and complete a simulated checkout. The products and categories are pulled from the FakeStoreAPI.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- View products from the FakeStoreAPI
+- Filter products by category
+- View product images, prices, descriptions, categories and ratings
+- Add products to the shopping cart
+- Add the same product multiple times and update the quantity
+- Remove products from the cart
+- View the total number of items in the cart
+- Calculate the total price automatically
+- Cart data is saved using sessionStorage
+- Clear the entire shopping cart
+- Simulated checkout with a success message
+- Responsive layout for different screen sizes
 
-## React Compiler
+## Technologies Used
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- React
+- TypeScript
+- Vite
+- React Query
+- Redux Toolkit
+- React Redux
+- Axios
+- FakeStoreAPI
+- sessionStorage
+- CSS
 
-## Expanding the ESLint configuration
+## How It Works
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+React Query is used to fetch the products and categories from the FakeStoreAPI. When a category is selected, the product list updates to show products from that category. Redux Toolkit handles the shopping cart. When a product is added, Redux keeps track of the product and its quantity. The cart also calculates the total number of items and the total price. I used sessionStorage so the shopping cart does not disappear when the page is refreshed. When the user checks out or clears the cart, the Redux state and sessionStorage are cleared.
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+## How to Run the App
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+Clone the repository:
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-
+```bash
+git clone https://github.com/DavidGonzalez009/advanced-ecommerce-app.git
 ```
 
-You can also install [eslint-plugin-react-x](https://npmx.dev/package/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://npmx.dev/package/eslint-plugin-react-dom) for React-specific lint rules:
+Go into the project folder:
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-
+```bash
+cd advanced-ecommerce-app
 ```
+
+Install the dependencies:
+
+```bash
+npm install
+```
+
+Start the development server:
+
+```bash
+npm run dev
+```
+
+Then open the local URL shown in the terminal.
+
+## Build
+
+To create a production build:
+
+```bash
+npm run build
+```
+
+## What I Learned
+
+This project gave me more practice working with React and TypeScript while also introducing me to using React Query and Redux Toolkit together. I got more experience fetching API data, managing state across components, working with shopping cart logic, and using sessionStorage to keep data after a page refresh.
