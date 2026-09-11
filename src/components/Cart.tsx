@@ -1,9 +1,11 @@
+import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import type { RootState } from "../redux/store";
-import { clearCart, removeFromCart } from "../redux/cartSlice";
+import { clearCart, removeFromCart, updateQuantity } from "../redux/cartSlice";
 
 const Cart = () => {
   const dispatch = useDispatch();
+  const [checkedOut, setCheckedOut] = useState(false);
 
   const cartItems = useSelector((state: RootState) => state.cart.items);
 
@@ -18,14 +20,16 @@ const Cart = () => {
   );
 
   const handleCheckout = () => {
-    if (cartItems.length === 0) {
-      alert("Your cart is empty.");
-      return;
-    }
+    if (cartItems.length === 0) return;
 
     dispatch(clearCart());
     sessionStorage.removeItem("cart");
-    alert("Checkout successful!");
+
+    setCheckedOut(true);
+
+    setTimeout(() => {
+      setCheckedOut(false);
+    }, 3000);
   };
 
   const handleClearCart = () => {
@@ -53,7 +57,19 @@ const Cart = () => {
           {cartItems.map((item) => (
             <div className="cart-item" key={item.id}>
               <div className="cart-image-wrapper">
-                <img className="cart-image" src={item.image} alt={item.title} />
+                <img
+                  className="cart-image"
+                  src={item.image}
+                  alt={item.title}
+                  onError={(event) => {
+                    const img = event.currentTarget;
+
+                    if (img.dataset.fallback) return;
+
+                    img.dataset.fallback = "true";
+                    img.src = "https://placehold.co/300";
+                  }}
+                />
               </div>
 
               <div className="cart-item-info">
@@ -61,7 +77,35 @@ const Cart = () => {
 
                 <p className="cart-item-price">${item.price.toFixed(2)}</p>
 
-                <p className="cart-item-quantity">Quantity: {item.quantity}</p>
+                <div className="quantity-controls">
+                  <button
+                    onClick={() =>
+                      dispatch(
+                        updateQuantity({
+                          id: item.id,
+                          quantity: item.quantity - 1,
+                        }),
+                      )
+                    }
+                  >
+                    −
+                  </button>
+
+                  <span>{item.quantity}</span>
+
+                  <button
+                    onClick={() =>
+                      dispatch(
+                        updateQuantity({
+                          id: item.id,
+                          quantity: item.quantity + 1,
+                        }),
+                      )
+                    }
+                  >
+                    +
+                  </button>
+                </div>
 
                 <button
                   className="remove-button"
@@ -91,7 +135,12 @@ const Cart = () => {
         </div>
       </div>
 
-      <button className="checkout-button" onClick={handleCheckout}>
+      {checkedOut && <p className="checkout-success">Checkout successful!</p>}
+      <button
+        className="checkout-button"
+        onClick={handleCheckout}
+        disabled={cartItems.length === 0}
+      >
         Checkout
       </button>
 

@@ -36,20 +36,12 @@ const ProductList = () => {
     queryFn: fetchCategories,
   });
 
-  if (isLoading) {
-    return <p className="status-message">Loading products...</p>;
+  if (isLoading || categoriesLoading) {
+    return <p className="status-message">Loading...</p>;
   }
 
-  if (error) {
-    return <p className="status-message">Unable to load products.</p>;
-  }
-
-  if (categoriesLoading) {
-    return <p className="status-message">Loading categories...</p>;
-  }
-
-  if (categoriesError) {
-    return <p className="status-message">Unable to load categories.</p>;
+  if (error || categoriesError) {
+    return <p className="status-message">Something went wrong.</p>;
   }
 
   return (
@@ -88,7 +80,12 @@ const ProductList = () => {
                 src={product.image}
                 alt={product.title}
                 onError={(event) => {
-                  event.currentTarget.src = "https://via.placeholder.com/300";
+                  const img = event.currentTarget;
+
+                  if (img.dataset.fallback) return;
+
+                  img.dataset.fallback = "true";
+                  img.src = "https://placehold.co/300";
                 }}
               />
             </div>
