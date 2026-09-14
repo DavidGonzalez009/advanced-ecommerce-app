@@ -2,6 +2,8 @@ import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import type { RootState } from "../redux/store";
 import { clearCart, removeFromCart, updateQuantity } from "../redux/cartSlice";
+import { addDoc, collection, serverTimestamp } from "firebase/firestore";
+import { auth, db } from "../firebase";
 
 const Cart = () => {
   const dispatch = useDispatch();
@@ -19,17 +21,35 @@ const Cart = () => {
     0,
   );
 
-  const handleCheckout = () => {
+  const handleCheckout = async () => {
     if (cartItems.length === 0) return;
+    if (!auth.currentUser) {
+      alert("Please log in before checking out.");
+      return;
+    }
 
-    dispatch(clearCart());
-    sessionStorage.removeItem("cart");
+    try {
+      await addDoc(collection(db, "orders"), {
+        userId: auth.currentUser.uid,
+        userEmail: auth.currentUser.email,
+        products: cartItems,
+        totalItems,
+        totalPrice,
+        createdAt: serverTimestamp(),
+      });
 
-    setCheckedOut(true);
+      dispatch(clearCart());
+      sessionStorage.removeItem("cart");
 
-    setTimeout(() => {
-      setCheckedOut(false);
-    }, 3000);
+      setCheckedOut(true);
+
+      setTimeout(() => {
+        setCheckedOut(false);
+      }, 3000);
+    } catch (error) {
+      console.error(error);
+      alert("Unable to place order.");
+    }
   };
 
   const handleClearCart = () => {

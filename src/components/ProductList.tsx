@@ -1,19 +1,86 @@
 import { useState } from "react";
 import { useDispatch } from "react-redux";
-import { useQuery } from "@tanstack/react-query";
-
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   fetchProducts,
   fetchCategories,
   fetchProductsByCategory,
+  createProduct,
+  updateProduct,
+  deleteProduct,
 } from "../api/products";
-
 import { addToCart } from "../redux/cartSlice";
 
 const ProductList = () => {
   const dispatch = useDispatch();
+  const queryClient = useQueryClient();
 
   const [selectedCategory, setSelectedCategory] = useState("");
+  const createProductMutation = useMutation({
+    mutationFn: createProduct,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["products"] });
+      queryClient.invalidateQueries({ queryKey: ["categories"] });
+    },
+  });
+
+  const [newProduct, setNewProduct] = useState({
+    title: "",
+    description: "",
+    price: 0,
+    category: "",
+    image: "",
+    rating: {
+      rate: 0,
+      count: 0,
+    },
+  });
+
+  const handleCreateProduct = (event: React.FormEvent) => {
+    event.preventDefault();
+
+    createProductMutation.mutate(newProduct, {
+      onSuccess: () => {
+        setNewProduct({
+          title: "",
+          description: "",
+          price: 0,
+          category: "",
+          image: "",
+          rating: {
+            rate: 0,
+            count: 0,
+          },
+        });
+
+        alert("Product created successfully!");
+      },
+    });
+  };
+
+  const updateProductMutation = useMutation({
+    mutationFn: ({
+      id,
+      product,
+    }: {
+      id: string;
+      product: Parameters<typeof updateProduct>[1];
+    }) => updateProduct(id, product),
+
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["products"] });
+      queryClient.invalidateQueries({ queryKey: ["categories"] });
+    },
+  });
+
+  const deleteProductMutation = useMutation({
+    mutationFn: deleteProduct,
+
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["products"] });
+      queryClient.invalidateQueries({ queryKey: ["categories"] });
+    },
+  });
 
   const {
     data: products,
@@ -46,6 +113,68 @@ const ProductList = () => {
 
   return (
     <section className="catalog-section">
+      <form onSubmit={handleCreateProduct}>
+        <h2>Add Product</h2>
+        <input
+          type="text"
+          placeholder="Title"
+          value={newProduct.title}
+          onChange={(event) =>
+            setNewProduct({
+              ...newProduct,
+              title: event.target.value,
+            })
+          }
+        />
+        <input
+          type="number"
+          placeholder="Price"
+          value={newProduct.price}
+          onChange={(event) =>
+            setNewProduct({
+              ...newProduct,
+              price: Number(event.target.value),
+            })
+          }
+        />
+        <input
+          type="text"
+          placeholder="Category"
+          value={newProduct.category}
+          onChange={(event) =>
+            setNewProduct({
+              ...newProduct,
+              category: event.target.value,
+            })
+          }
+        />
+
+        <input
+          type="text"
+          placeholder="Description"
+          value={newProduct.description}
+          onChange={(event) =>
+            setNewProduct({
+              ...newProduct,
+              description: event.target.value,
+            })
+          }
+        />
+
+        <input
+          type="text"
+          placeholder="Image URL"
+          value={newProduct.image}
+          onChange={(event) =>
+            setNewProduct({
+              ...newProduct,
+              image: event.target.value,
+            })
+          }
+        />
+
+        <button type="submit">Add Product</button>
+      </form>
       <div className="catalog-header">
         <div>
           <h1>Product Catalog</h1>
@@ -110,6 +239,39 @@ const ProductList = () => {
                 onClick={() => dispatch(addToCart(product))}
               >
                 Add to Cart
+              </button>
+              <button
+                onClick={() => {
+                  const newTitle = prompt(
+                    "Enter a new product title:",
+                    product.title,
+                  );
+
+                  if (!newTitle) return;
+
+                  updateProductMutation.mutate({
+                    id: product.id,
+                    product: {
+                      title: newTitle,
+                    },
+                  });
+                }}
+              >
+                Edit Product
+              </button>
+
+              <button
+                onClick={() => {
+                  const confirmed = confirm(
+                    `Are you sure you want to delete ${product.title}?`,
+                  );
+
+                  if (!confirmed) return;
+
+                  deleteProductMutation.mutate(product.id);
+                }}
+              >
+                Delete Product
               </button>
             </div>
           </article>
