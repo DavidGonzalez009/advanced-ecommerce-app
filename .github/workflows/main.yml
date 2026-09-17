@@ -44,19 +44,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: "24"
-
-      - name: Install Vercel CLI
-        run: npm install --global vercel@latest
-
-      - name: Link Vercel project
-        run: vercel link --yes --project advanced-ecommerce-app --scope david-gonzalez3 --token=${{ secrets.VERCEL_TOKEN }}
-
-      - name: Deploy to Vercel
-        run: vercel deploy --prod --yes --scope david-gonzalez3 --token=${{ secrets.VERCEL_TOKEN }}
+      - name: Trigger Vercel production deployment
+        env:
+          VERCEL_DEPLOY_HOOK: ${{ secrets.VERCEL_DEPLOY_HOOK }}
+        run: curl --fail --show-error --silent -X POST "$VERCEL_DEPLOY_HOOK"
